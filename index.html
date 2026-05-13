@@ -1,100 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fuel Efficiency Predictor</title>
-  <style>
-    * {
-      box-sizing: border-box;
+
+      font-size: 14px;
     }
 
-    :root {
-      --ink: #172033;
-      --muted: #5b6578;
-      --panel: #ffffff;
-      --soft: #f4f7fb;
-      --line: #d9e1ec;
-      --accent: #c21f32;
-      --accent-dark: #8f1524;
-      --teal: #1f8a70;
-      --blue: #275f96;
-      --warning: #b7791f;
-      --danger: #9b1c31;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #121a2a 0%, #243149 52%, #331720 100%);
-      color: var(--ink);
-      font-family: "Segoe UI", Arial, sans-serif;
-      padding: 24px;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-    }
-
-    .topbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
-      gap: 16px;
-      align-items: stretch;
-      color: #ffffff;
-      margin-bottom: 16px;
-    }
-
-    .intro,
-    .metric-strip,
-    .main-card,
-    .model-card {
-      border: 1px solid rgba(255, 255, 255, 0.16);
+    .svr-details {
+      margin-top: 14px;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
-    }
-
-    .intro {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 24px;
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(194, 31, 50, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #ffd8dd;
-      padding: 7px 11px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-size: 40px;
-      line-height: 1.08;
-      letter-spacing: 0;
-    }
-
-    .intro p {
-      max-width: 760px;
-      margin: 0;
-      color: #e7edf6;
-      line-height: 1.6;
-      font-size: 16px;
-    }
-
-    .metric-strip {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1px;
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.18);
+      background: #ffffff;
     }
 
-    .hero-metric {
+    .svr-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(120px, 0.75fr);
+      gap: 12px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      align-items: center;
+    }
+
+    .svr-row:first-child {
+      border-top: 0;
+    }
+
+    .svr-row span {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .svr-row strong {
+      color: var(--ink);
+      text-align: right;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .footer {
+      color: #dce6f3;
+      text-align: center;
+
+          <div class="note">
+            <strong>Model loaded:</strong> SVR with RBF kernel, C=100, gamma=0.1,
+            epsilon=0.1. The prediction runs directly in JavaScript from the exported
+            scaler, support vectors, dual coefficients, and bias term.
+            epsilon=0.1, and bias/intercept b=23.421634. The prediction runs directly
+            in JavaScript from the exported scaler, support vectors, dual coefficients,
+            and bias term.
+          </div>
+        </section>
+
+                <span>Train test split</span>
+              </div>
+            </div>
+
+            <div class="svr-details" aria-label="SVR training details">
+              <div class="svr-row">
+                <span>Kernel</span>
+                <strong id="kernelMetric">RBF</strong>
+              </div>
+              <div class="svr-row">
+                <span>C / Gamma / Epsilon</span>
+                <strong id="parameterMetric">100 / 0.1 / 0.1</strong>
+              </div>
+              <div class="svr-row">
+                <span>Bias term b</span>
+                <strong id="biasMetric">23.421634</strong>
+              </div>
+              <div class="svr-row">
+                <span>Training / Test samples</span>
+                <strong id="splitMetric">313 / 79</strong>
+              </div>
+              <div class="svr-row">
+                <span>Support vector percentage</span>
+                <strong id="supportPercentMetric">94.89%</strong>
+              </div>
+              <div class="svr-row">
+                <span>Support vectors shape</span>
+                <strong id="supportShapeMetric">(297, 8)</strong>
+              </div>
+              <div class="svr-row">
+                <span>Dual coefficients shape</span>
+                <strong id="dualShapeMetric">(1, 297)</strong>
+              </div>
+            </div>
+
+            <div class="detail" id="predictionDetail">
+              Use the sample button to reproduce the project sample prediction.
+            </div>
+
+    function updateMetrics() {
+      const metrics = window.SVR_MODEL.metrics;
+      const params = window.SVR_MODEL.parameters;
+      const supportVectorCount = window.SVR_MODEL.supportVectors.length;
+      const featureCount = window.SVR_MODEL.supportVectors[0].length;
+      const supportPercentage = (supportVectorCount / metrics.trainingRows) * 100;
+
+      document.getElementById("r2Metric").textContent = metrics.r2.toFixed(4);
+      document.getElementById("rmseMetric").textContent = metrics.rmse.toFixed(3);
+      document.getElementById("supportMetric").textContent = String(metrics.supportVectors);
