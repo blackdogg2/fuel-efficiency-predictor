@@ -7,596 +7,94 @@
   <style>
     * {
       box-sizing: border-box;
-      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    :root {
+      --ink: #172033;
+      --muted: #5b6578;
+      --panel: #ffffff;
+      --soft: #f4f7fb;
+      --line: #d9e1ec;
+      --accent: #c21f32;
+      --accent-dark: #8f1524;
+      --teal: #1f8a70;
+      --blue: #275f96;
+      --warning: #b7791f;
+      --danger: #9b1c31;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at top left, rgba(239, 68, 68, 0.28), transparent 32%),
-        radial-gradient(circle at bottom right, rgba(185, 28, 28, 0.25), transparent 35%),
-        linear-gradient(135deg, #19070a, #2b0b10 55%, #111827);
-      color: #0f172a;
-      padding: 28px;
+      background: linear-gradient(135deg, #121a2a 0%, #243149 52%, #331720 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 24px;
     }
 
     .page {
       width: 100%;
-      max-width: 1150px;
-      margin: auto;
+      max-width: 1180px;
+      margin: 0 auto;
     }
 
-    .hero {
+    .topbar {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 24px;
-      align-items: center;
-      margin-bottom: 24px;
-      color: white;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      gap: 16px;
+      align-items: stretch;
+      color: #ffffff;
+      margin-bottom: 16px;
     }
 
-    .hero-card {
-      background: rgba(255, 255, 255, 0.08);
+    .intro,
+    .metric-strip,
+    .main-card,
+    .model-card {
       border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 28px;
-      padding: 34px;
-      backdrop-filter: blur(18px);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
+    }
+
+    .intro {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 24px;
     }
 
     .tag {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(239, 68, 68, 0.18);
-      color: #fecaca;
-      border: 1px solid rgba(254, 202, 202, 0.28);
-      padding: 8px 14px;
+      background: rgba(194, 31, 50, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffd8dd;
+      padding: 7px 11px;
       border-radius: 999px;
-      font-size: 14px;
-      margin-bottom: 18px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 14px;
     }
 
     h1 {
-      font-size: clamp(34px, 5vw, 58px);
-      line-height: 1.02;
-      margin: 0 0 16px;
-      letter-spacing: -1.8px;
+      margin: 0 0 12px;
+      font-size: 40px;
+      line-height: 1.08;
+      letter-spacing: 0;
     }
 
-    .hero p {
-      color: #e5e7eb;
-      font-size: 17px;
-      line-height: 1.7;
+    .intro p {
+      max-width: 760px;
       margin: 0;
-      max-width: 680px;
+      color: #e7edf6;
+      line-height: 1.6;
+      font-size: 16px;
     }
 
-    .mini-stats {
-      display: grid;
-      gap: 14px;
-    }
-
-    .stat {
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 22px;
-      padding: 20px;
-      color: white;
-      backdrop-filter: blur(14px);
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 27px;
-      margin-bottom: 4px;
-    }
-
-    .stat span {
-      color: #e5e7eb;
-      font-size: 14px;
-    }
-
-    .main-card {
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 30px;
-      overflow: hidden;
-      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.32);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .content {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 0;
-    }
-
-    .form-section {
-      padding: 34px;
-      background: #ffffff;
-    }
-
-    .result-section {
-      padding: 34px;
-      background: linear-gradient(180deg, #fff7f7, #fee2e2);
-      border-left: 1px solid #fecaca;
-    }
-
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .section-title h2 {
-      margin: 0;
-      font-size: 25px;
-      letter-spacing: -0.4px;
-    }
-
-    .section-title span {
-      font-size: 13px;
-      color: #991b1b;
-      background: #fee2e2;
-      padding: 7px 12px;
-      border-radius: 999px;
-    }
-
-    .form-grid {
+    .metric-strip {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .field {
-      background: #fff7f7;
-      border: 1px solid #fecaca;
-      border-radius: 18px;
-      padding: 14px;
-      transition: 0.2s;
-    }
-
-    .field:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(127, 29, 29, 0.09);
-    }
-
-    label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #334155;
-      font-size: 14px;
-    }
-
-    label small {
-      color: #b91c1c;
-      font-weight: 600;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 13px 12px;
-      border: 1px solid #fca5a5;
-      border-radius: 13px;
-      font-size: 15px;
-      outline: none;
-      background: white;
-      color: #0f172a;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: #dc2626;
-      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.16);
-    }
-
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 0.55fr;
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    button {
-      border: none;
-      border-radius: 16px;
-      padding: 15px 18px;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: 0.22s;
-    }
-
-    .predict-btn {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      color: white;
-      box-shadow: 0 15px 25px rgba(185, 28, 28, 0.25);
-    }
-
-    .predict-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 30px rgba(185, 28, 28, 0.35);
-    }
-
-    .reset-btn {
-      background: #fee2e2;
-      color: #7f1d1d;
-    }
-
-    .reset-btn:hover {
-      background: #fecaca;
-    }
-
-    .note {
-      margin-top: 22px;
-      background: #fff1f2;
-      border: 1px solid #fecdd3;
-      padding: 16px;
-      border-radius: 18px;
-      font-size: 14px;
-      color: #7f1d1d;
-      line-height: 1.6;
-    }
-
-    .result-card {
-      background: #1f0a0d;
-      color: white;
-      border-radius: 28px;
-      padding: 28px;
-      text-align: center;
-      position: relative;
+      gap: 1px;
       overflow: hidden;
-      box-shadow: 0 18px 45px rgba(127, 29, 29, 0.25);
+      background: rgba(255, 255, 255, 0.18);
     }
 
-    .result-card::before {
-      content: "";
-      position: absolute;
-      width: 210px;
-      height: 210px;
-      background: rgba(239, 68, 68, 0.27);
-      border-radius: 50%;
-      top: -80px;
-      right: -70px;
-    }
-
-    .result-card p,
-    .result-card div {
-      position: relative;
-      z-index: 1;
-    }
-
-    .result-label {
-      margin: 0;
-      color: #fecaca;
-      font-size: 15px;
-    }
-
-    .mpg-value {
-      font-size: 72px;
-      font-weight: 900;
-      letter-spacing: -2px;
-      margin: 14px 0 0;
-      color: #fca5a5;
-    }
-
-    .unit {
-      font-size: 16px;
-      color: #d1d5db;
-      margin-bottom: 18px;
-    }
-
-    .rating {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 11px 18px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .good {
-      background: rgba(239, 68, 68, 0.18);
-      color: #fecaca;
-      border: 1px solid rgba(254, 202, 202, 0.35);
-    }
-
-    .average {
-      background: rgba(250, 204, 21, 0.16);
-      color: #fde68a;
-      border: 1px solid rgba(253, 230, 138, 0.35);
-    }
-
-    .poor {
-      background: rgba(127, 29, 29, 0.26);
-      color: #fecaca;
-      border: 1px solid rgba(254, 202, 202, 0.35);
-    }
-
-    .meter {
-      margin-top: 24px;
-      background: #fecaca;
-      height: 16px;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .meter-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, #7f1d1d, #ef4444, #fca5a5);
-      border-radius: 999px;
-      transition: width 0.5s ease;
-    }
-
-    .info {
-      margin-top: 24px;
-      background: white;
-      border: 1px solid #fecaca;
-      border-radius: 22px;
-      padding: 22px;
-      font-size: 14px;
-      color: #475569;
-      line-height: 1.7;
-    }
-
-    .info strong {
-      color: #0f172a;
-    }
-
-    .tips {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .tip {
-      background: #fff7f7;
-      border-radius: 15px;
-      padding: 13px;
-      border: 1px solid #fecaca;
-    }
-
-    .footer {
-      text-align: center;
-      color: #fecaca;
-      font-size: 13px;
-      margin-top: 18px;
-    }
-
-    @media (max-width: 900px) {
-      .hero,
-      .content {
-        grid-template-columns: 1fr;
-      }
-
-      .result-section {
-        border-left: none;
-        border-top: 1px solid #fecaca;
-      }
-    }
-
-    @media (max-width: 650px) {
-      body {
-        padding: 16px;
-      }
-
-      .form-section,
-      .result-section,
-      .hero-card {
-        padding: 22px;
-      }
-
-      .form-grid,
-      .button-row,
-      .tips {
-        grid-template-columns: 1fr;
-      }
-
-      .mpg-value {
-        font-size: 58px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <section class="hero">
-      <div class="hero-card">
-        <div class="tag">Machine Learning Project</div>
-        <h1>Vehicle Fuel Efficiency Predictor</h1>
-        <p>
-          Enter a car's technical specifications and estimate its fuel efficiency in MPG.
-          This page is designed for the Auto MPG dataset project and can be used as a clean demo interface for presentation.
-        </p>
-      </div>
-
-      <div class="mini-stats">
-        <div class="stat">
-          <strong>MPG</strong>
-          <span>Target value predicted by the model</span>
-        </div>
-        <div class="stat">
-          <strong>7 Inputs</strong>
-          <span>Engine, weight, year, origin, and performance data</span>
-        </div>
-        <div class="stat">
-          <strong>Higher = Better</strong>
-          <span>More miles travelled per gallon of fuel</span>
-        </div>
-      </div>
-    </section>
-
-    <main class="main-card">
-      <div class="content">
-        <section class="form-section">
-          <div class="section-title">
-            <h2>Vehicle Details</h2>
-            <span>Auto MPG Features</span>
-          </div>
-
-          <div class="form-grid">
-            <div class="field">
-              <label for="cylinders">Cylinders <small>engine</small></label>
-              <select id="cylinders">
-                <option value="4">4 cylinders</option>
-                <option value="6">6 cylinders</option>
-                <option value="8">8 cylinders</option>
-                <option value="3">3 cylinders</option>
-                <option value="5">5 cylinders</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="displacement">Displacement <small>cu in</small></label>
-              <input type="number" id="displacement" value="140" min="50" max="500" />
-            </div>
-
-            <div class="field">
-              <label for="horsepower">Horsepower <small>hp</small></label>
-              <input type="number" id="horsepower" value="90" min="40" max="250" />
-            </div>
-
-            <div class="field">
-              <label for="weight">Weight <small>lbs</small></label>
-              <input type="number" id="weight" value="2500" min="1500" max="5500" />
-            </div>
-
-            <div class="field">
-              <label for="acceleration">Acceleration <small>0-60 time</small></label>
-              <input type="number" id="acceleration" value="15.5" min="8" max="25" step="0.1" />
-            </div>
-
-            <div class="field">
-              <label for="modelYear">Model Year <small>70-82</small></label>
-              <input type="number" id="modelYear" value="76" min="70" max="82" />
-            </div>
-
-            <div class="field">
-              <label for="origin">Origin <small>region</small></label>
-              <select id="origin">
-                <option value="1">USA</option>
-                <option value="2">Europe</option>
-                <option value="3">Japan</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="button-row">
-            <button class="predict-btn" onclick="predictMPG()">Predict Fuel Efficiency</button>
-            <button class="reset-btn" onclick="resetForm()">Reset</button>
-          </div>
-
-          <div class="note">
-            <strong>Project note:</strong> This web page uses a simple built-in prediction formula for demonstration.
-            In the final version, you can connect this same interface to your trained Python machine learning model using Flask, FastAPI, or Streamlit.
-          </div>
-        </section>
-
-        <section class="result-section">
-          <div class="section-title">
-            <h2>Prediction</h2>
-            <span>Result Panel</span>
-          </div>
-
-          <div class="result-card">
-            <p class="result-label">Estimated Fuel Efficiency</p>
-            <div class="mpg-value" id="mpgValue">--</div>
-            <div class="unit">Miles Per Gallon</div>
-            <div class="rating average" id="rating">Waiting for input</div>
-          </div>
-
-          <div class="meter">
-            <div class="meter-fill" id="meterFill"></div>
-          </div>
-
-          <div class="info">
-            <strong>How to understand MPG:</strong><br />
-            MPG means miles per gallon. A higher MPG value means the vehicle uses fuel more efficiently.
-
-            <div class="tips">
-              <div class="tip">Poor<br />Below 18 MPG</div>
-              <div class="tip">Average<br />18-28 MPG</div>
-              <div class="tip">Good<br />Above 28 MPG</div>
-              <div class="tip">Tip<br />Lower weight usually improves MPG</div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <div class="footer">
-      Auto MPG Dataset - Fuel Efficiency Prediction - Machine Learning Regression Project
-    </div>
-  </div>
-
-  <script>
-    function predictMPG() {
-      const cylinders = Number(document.getElementById("cylinders").value);
-      const displacement = Number(document.getElementById("displacement").value);
-      const horsepower = Number(document.getElementById("horsepower").value);
-      const weight = Number(document.getElementById("weight").value);
-      const acceleration = Number(document.getElementById("acceleration").value);
-      const modelYear = Number(document.getElementById("modelYear").value);
-      const origin = Number(document.getElementById("origin").value);
-
-      let mpg = 45;
-      mpg -= cylinders * 1.2;
-      mpg -= displacement * 0.015;
-      mpg -= horsepower * 0.035;
-      mpg -= weight * 0.0045;
-      mpg += acceleration * 0.15;
-      mpg += (modelYear - 70) * 0.75;
-
-      if (origin === 2) mpg += 1.5;
-      if (origin === 3) mpg += 2.5;
-
-      if (mpg < 8) mpg = 8;
-      if (mpg > 50) mpg = 50;
-
-      const finalMPG = mpg.toFixed(2);
-      document.getElementById("mpgValue").textContent = finalMPG;
-
-      const rating = document.getElementById("rating");
-      rating.className = "rating";
-
-      if (mpg >= 28) {
-        rating.textContent = "Good Fuel Efficiency";
-        rating.classList.add("good");
-      } else if (mpg >= 18) {
-        rating.textContent = "Average Fuel Efficiency";
-        rating.classList.add("average");
-      } else {
-        rating.textContent = "Poor Fuel Efficiency";
-        rating.classList.add("poor");
-      }
-
-      const meterPercent = Math.min(Math.max((mpg / 50) * 100, 0), 100);
-      document.getElementById("meterFill").style.width = meterPercent + "%";
-    }
-
-    function resetForm() {
-      document.getElementById("cylinders").value = 4;
-      document.getElementById("displacement").value = 140;
-      document.getElementById("horsepower").value = 90;
-      document.getElementById("weight").value = 2500;
-      document.getElementById("acceleration").value = 15.5;
-      document.getElementById("modelYear").value = 76;
-      document.getElementById("origin").value = 1;
-      document.getElementById("mpgValue").textContent = "--";
-      document.getElementById("rating").className = "rating average";
-      document.getElementById("rating").textContent = "Waiting for input";
-      document.getElementById("meterFill").style.width = "0%";
-    }
-  </script>
-</body>
-</html>
+    .hero-metric {
