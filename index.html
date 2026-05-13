@@ -1,11 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fuel Efficiency Predictor</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
 
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(239, 68, 68, 0.28), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(185, 28, 28, 0.25), transparent 35%),
+        linear-gradient(135deg, #19070a, #2b0b10 55%, #111827);
+      color: #0f172a;
+      padding: 28px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1150px;
+      margin: auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 24px;
+      color: white;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 28px;
+      padding: 34px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239, 68, 68, 0.18);
+      color: #fecaca;
+      border: 1px solid rgba(254, 202, 202, 0.28);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.02;
+      margin: 0 0 16px;
+      letter-spacing: -1.8px;
+    }
+
+    .hero p {
+      color: #e5e7eb;
+      font-size: 17px;
+      line-height: 1.7;
+      margin: 0;
+      max-width: 680px;
+    }
+
+    .mini-stats {
+      display: grid;
+      gap: 14px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 22px;
+      padding: 20px;
+      color: white;
+      backdrop-filter: blur(14px);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 27px;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: #e5e7eb;
       font-size: 14px;
     }
 
-    .svr-details {
+    .main-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 0;
+    }
+
+    .form-section {
+      padding: 34px;
+      background: #ffffff;
+    }
+
+    .result-section {
+      padding: 34px;
+      background: linear-gradient(180deg, #fff7f7, #fee2e2);
+      border-left: 1px solid #fecaca;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 25px;
+      letter-spacing: -0.4px;
+    }
+
+    .section-title span {
+      font-size: 13px;
+      color: #991b1b;
+      background: #fee2e2;
+      padding: 7px 12px;
+      border-radius: 999px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .field {
+      background: #fff7f7;
+      border: 1px solid #fecaca;
+      border-radius: 18px;
+      padding: 14px;
+      transition: 0.2s;
+    }
+
+    .field:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(127, 29, 29, 0.09);
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #334155;
+      font-size: 14px;
+    }
+
+    label small {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px 12px;
+      border: 1px solid #fca5a5;
+      border-radius: 13px;
+      font-size: 15px;
+      outline: none;
+      background: white;
+      color: #0f172a;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.16);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 0.55fr;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 15px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.22s;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .predict-btn {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: white;
+      box-shadow: 0 15px 25px rgba(185, 28, 28, 0.25);
+    }
+
+    .predict-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(185, 28, 28, 0.35);
+    }
+
+    .reset-btn {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .reset-btn:hover {
+      background: #fecaca;
+    }
+
+    .note {
+      margin-top: 22px;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      padding: 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      color: #7f1d1d;
+      line-height: 1.6;
+    }
+
+    .model-status {
       margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
+      background: #1f0a0d;
+      color: #fecaca;
+      border: 1px solid rgba(254, 202, 202, 0.22);
+      padding: 14px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .result-card {
+      background: #1f0a0d;
+      color: white;
+      border-radius: 28px;
+      padding: 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(127, 29, 29, 0.25);
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      background: rgba(239, 68, 68, 0.27);
+      border-radius: 50%;
+      top: -80px;
+      right: -70px;
+    }
+
+    .result-card p,
+    .result-card div {
+      position: relative;
+      z-index: 1;
+    }
+
+    .result-label {
+      margin: 0;
+      color: #fecaca;
+      font-size: 15px;
+    }
+
+    .mpg-value {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin: 14px 0 0;
+      color: #fca5a5;
+    }
+
+    .unit {
+      font-size: 16px;
+      color: #d1d5db;
+      margin-bottom: 18px;
+    }
+
+    .rating {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .good {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fecaca;
+      border: 1px solid rgba(254, 202, 202, 0.35);
+    }
+
+    .average {
+      background: rgba(250, 204, 21, 0.16);
+      color: #fde68a;
+      border: 1px solid rgba(253, 230, 138, 0.35);
+    }
+
+    .poor {
+      background: rgba(127, 29, 29, 0.26);
+      color: #fecaca;
+      border: 1px solid rgba(254, 202, 202, 0.35);
+    }
+
+    .meter {
+      margin-top: 24px;
+      background: #fecaca;
+      height: 16px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #7f1d1d, #ef4444, #fca5a5);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    .info {
+      margin-top: 24px;
+      background: white;
+      border: 1px solid #fecaca;
+      border-radius: 22px;
+      padding: 22px;
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.7;
+    }
+
+    .info strong {
+      color: #0f172a;
+    }
+
+    .tips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .tip {
+      background: #fff7f7;
+      border-radius: 15px;
+      padding: 13px;
+      border: 1px solid #fecaca;
+    }
+
+    .svr-details {
+      margin-top: 18px;
+      border: 1px solid #fecaca;
+      border-radius: 18px;
       overflow: hidden;
       background: #ffffff;
     }
@@ -14,8 +397,8 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(120px, 0.75fr);
       gap: 12px;
-      padding: 10px 12px;
-      border-top: 1px solid var(--line);
+      padding: 11px 13px;
+      border-top: 1px solid #fecaca;
       font-size: 13px;
       align-items: center;
     }
@@ -25,77 +408,434 @@
     }
 
     .svr-row span {
-      color: var(--muted);
-      font-weight: 700;
+      color: #7f1d1d;
+      font-weight: 800;
     }
 
     .svr-row strong {
-      color: var(--ink);
+      color: #0f172a;
       text-align: right;
       font-size: 13px;
       overflow-wrap: anywhere;
     }
 
     .footer {
-      color: #dce6f3;
       text-align: center;
+      color: #fecaca;
+      font-size: 13px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .result-section {
+        border-left: none;
+        border-top: 1px solid #fecaca;
+      }
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 16px;
+      }
+
+      .form-section,
+      .result-section,
+      .hero-card {
+        padding: 22px;
+      }
+
+      .form-grid,
+      .button-row,
+      .tips {
+        grid-template-columns: 1fr;
+      }
+
+      .mpg-value {
+        font-size: 58px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="tag">Machine Learning Project</div>
+        <h1>Vehicle Fuel Efficiency Predictor</h1>
+        <p>
+          Enter a car's technical specifications and estimate its fuel efficiency in MPG.
+          This version uses the same SVR training and prediction workflow as the Python code:
+          StandardScaler + SVR with RBF kernel.
+        </p>
+      </div>
+
+      <div class="mini-stats">
+        <div class="stat">
+          <strong id="topR2">Loading</strong>
+          <span>SVR R² score</span>
+        </div>
+        <div class="stat">
+          <strong id="topRmse">Loading</strong>
+          <span>SVR RMSE</span>
+        </div>
+        <div class="stat">
+          <strong>8 Features</strong>
+          <span>7 visible inputs + one-hot encoded origin</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="main-card">
+      <div class="content">
+        <section class="form-section">
+          <div class="section-title">
+            <h2>Vehicle Details</h2>
+            <span>Auto MPG Features</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="cylinders">Cylinders <small>engine</small></label>
+              <select id="cylinders">
+                <option value="4">4 cylinders</option>
+                <option value="6">6 cylinders</option>
+                <option value="8">8 cylinders</option>
+                <option value="3">3 cylinders</option>
+                <option value="5">5 cylinders</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="displacement">Displacement <small>cu in</small></label>
+              <input type="number" id="displacement" value="307" min="50" max="500" />
+            </div>
+
+            <div class="field">
+              <label for="horsepower">Horsepower <small>hp</small></label>
+              <input type="number" id="horsepower" value="130" min="40" max="250" />
+            </div>
+
+            <div class="field">
+              <label for="weight">Weight <small>lbs</small></label>
+              <input type="number" id="weight" value="3504" min="1500" max="5500" />
+            </div>
+
+            <div class="field">
+              <label for="acceleration">Acceleration <small>0-60 time</small></label>
+              <input type="number" id="acceleration" value="12" min="8" max="25" step="0.1" />
+            </div>
+
+            <div class="field">
+              <label for="modelYear">Model Year <small>70-82</small></label>
+              <input type="number" id="modelYear" value="70" min="70" max="82" />
+            </div>
+
+            <div class="field">
+              <label for="origin">Origin <small>region</small></label>
+              <select id="origin">
+                <option value="1">USA</option>
+                <option value="2">Europe</option>
+                <option value="3">Japan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button class="predict-btn" id="predictButton" onclick="predictMPG()" disabled>Loading Model...</button>
+            <button class="reset-btn" onclick="resetForm()">Reset</button>
+          </div>
+
+          <div class="model-status" id="modelStatus">
+            Loading Python, pandas, scikit-learn, dataset, scaler, and SVR model. Please wait until the button becomes active.
+          </div>
 
           <div class="note">
             <strong>Model loaded:</strong> SVR with RBF kernel, C=100, gamma=0.1,
-            epsilon=0.1. The prediction runs directly in JavaScript from the exported
-            scaler, support vectors, dual coefficients, and bias term.
-            epsilon=0.1, and bias/intercept b=23.421634. The prediction runs directly
-            in JavaScript from the exported scaler, support vectors, dual coefficients,
-            and bias term.
+            epsilon=0.1. The calculation follows your Python workflow: dataset cleaning,
+            one-hot encoding for origin, 80/20 train-test split, StandardScaler, and SVR prediction.
           </div>
         </section>
 
-                <span>Train test split</span>
-              </div>
+        <section class="result-section">
+          <div class="section-title">
+            <h2>Prediction</h2>
+            <span>Result Panel</span>
+          </div>
+
+          <div class="result-card">
+            <p class="result-label">Estimated Fuel Efficiency</p>
+            <div class="mpg-value" id="mpgValue">--</div>
+            <div class="unit">Miles Per Gallon</div>
+            <div class="rating average" id="rating">Waiting for model</div>
+          </div>
+
+          <div class="meter">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+
+          <div class="svr-details" aria-label="SVR training details">
+            <div class="svr-row">
+              <span>Kernel</span>
+              <strong>RBF</strong>
             </div>
-
-            <div class="svr-details" aria-label="SVR training details">
-              <div class="svr-row">
-                <span>Kernel</span>
-                <strong id="kernelMetric">RBF</strong>
-              </div>
-              <div class="svr-row">
-                <span>C / Gamma / Epsilon</span>
-                <strong id="parameterMetric">100 / 0.1 / 0.1</strong>
-              </div>
-              <div class="svr-row">
-                <span>Bias term b</span>
-                <strong id="biasMetric">23.421634</strong>
-              </div>
-              <div class="svr-row">
-                <span>Training / Test samples</span>
-                <strong id="splitMetric">313 / 79</strong>
-              </div>
-              <div class="svr-row">
-                <span>Support vector percentage</span>
-                <strong id="supportPercentMetric">94.89%</strong>
-              </div>
-              <div class="svr-row">
-                <span>Support vectors shape</span>
-                <strong id="supportShapeMetric">(297, 8)</strong>
-              </div>
-              <div class="svr-row">
-                <span>Dual coefficients shape</span>
-                <strong id="dualShapeMetric">(1, 297)</strong>
-              </div>
+            <div class="svr-row">
+              <span>C / Gamma / Epsilon</span>
+              <strong>100 / 0.1 / 0.1</strong>
             </div>
-
-            <div class="detail" id="predictionDetail">
-              Use the sample button to reproduce the project sample prediction.
+            <div class="svr-row">
+              <span>Bias term b</span>
+              <strong id="biasMetric">Loading</strong>
             </div>
+            <div class="svr-row">
+              <span>Training / Test samples</span>
+              <strong id="splitMetric">Loading</strong>
+            </div>
+            <div class="svr-row">
+              <span>Support vectors</span>
+              <strong id="supportMetric">Loading</strong>
+            </div>
+            <div class="svr-row">
+              <span>RMSE / R²</span>
+              <strong id="metricText">Loading</strong>
+            </div>
+          </div>
 
-    function updateMetrics() {
-      const metrics = window.SVR_MODEL.metrics;
-      const params = window.SVR_MODEL.parameters;
-      const supportVectorCount = window.SVR_MODEL.supportVectors.length;
-      const featureCount = window.SVR_MODEL.supportVectors[0].length;
-      const supportPercentage = (supportVectorCount / metrics.trainingRows) * 100;
+          <div class="info">
+            <strong>How to understand MPG:</strong><br />
+            MPG means miles per gallon. A higher MPG value means the vehicle uses fuel more efficiently.
 
-      document.getElementById("r2Metric").textContent = metrics.r2.toFixed(4);
-      document.getElementById("rmseMetric").textContent = metrics.rmse.toFixed(3);
-      document.getElementById("supportMetric").textContent = String(metrics.supportVectors);
+            <div class="tips">
+              <div class="tip">Poor<br />Below 18 MPG</div>
+              <div class="tip">Average<br />18-28 MPG</div>
+              <div class="tip">Good<br />Above 28 MPG</div>
+              <div class="tip">Tip<br />Lower weight usually improves MPG</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="footer">
+      Auto MPG Dataset - Fuel Efficiency Prediction - SVR Machine Learning Regression Project
+    </div>
+  </div>
+
+  <script>
+    let pyodide = null;
+    let modelReady = false;
+
+    const DATA_URL = "https://gist.githubusercontent.com/wmeints/80c1ba22ceeb7a29a0e5e979f0b0afba/raw/8629fe51f0e7642fc5e05567130807b02a93af5e/auto-mpg.csv";
+
+    function setStatus(message) {
+      document.getElementById("modelStatus").textContent = message;
+    }
+
+    async function loadSVRModel() {
+      try {
+        setStatus("Loading Python runtime...");
+        pyodide = await loadPyodide();
+
+        setStatus("Loading numpy, pandas, scikit-learn, and matplotlib...");
+        await pyodide.loadPackage(["numpy", "pandas", "scikit-learn", "matplotlib"]);
+
+        setStatus("Downloading Auto MPG dataset...");
+        const response = await fetch(DATA_URL);
+        const csvText = await response.text();
+        pyodide.globals.set("csv_text", csvText);
+
+        setStatus("Training SVR model with the same Python calculation...");
+        await pyodide.runPythonAsync(`
+import pandas as pd
+import numpy as np
+from io import StringIO
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, r2_score
+import warnings
+warnings.filterwarnings('ignore')
+
+data = pd.read_csv(StringIO(csv_text), na_values='?')
+data = data.rename(columns={
+    'model year': 'model_year',
+    'car name': 'car_name'
+})
+
+data = data.dropna()
+data = data.drop(['car_name'], axis=1)
+
+X = data.drop(['mpg'], axis=1)
+y = data['mpg']
+
+X = pd.get_dummies(X, columns=['origin'], drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+model = SVR(
+    kernel='rbf',
+    C=100,
+    gamma=0.1,
+    epsilon=0.1
+)
+
+model.fit(X_train_scaled, y_train)
+
+y_pred = model.predict(X_test_scaled)
+
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
+
+cv_rmse = np.sqrt(
+    -cross_val_score(
+        model,
+        X_train_scaled,
+        y_train,
+        cv=5,
+        scoring='neg_mean_squared_error'
+    ).mean()
+)
+
+def predict_mpg(cylinders, displacement, horsepower, weight, acceleration, model_year, origin):
+    inp = pd.DataFrame({
+        'cylinders': [cylinders],
+        'displacement': [displacement],
+        'horsepower': [horsepower],
+        'weight': [weight],
+        'acceleration': [acceleration],
+        'model_year': [model_year],
+        'origin': [origin]
+    })
+
+    inp = pd.get_dummies(inp, columns=['origin'], drop_first=True)
+
+    for col in X.columns:
+        if col not in inp.columns:
+            inp[col] = 0
+
+    inp = inp[X.columns]
+    inp_scaled = scaler.transform(inp)
+    prediction = model.predict(inp_scaled)
+    return float(prediction[0])
+
+model_info = {
+    'mse': float(mse),
+    'rmse': float(rmse),
+    'r2': float(r2),
+    'cv_rmse': float(cv_rmse),
+    'bias': float(model.intercept_[0]),
+    'support_vectors': int(len(model.support_)),
+    'train_rows': int(X_train.shape[0]),
+    'test_rows': int(X_test.shape[0]),
+    'feature_count': int(X_train.shape[1])
+}
+        `);
+
+        const info = pyodide.globals.get("model_info").toJs({ dict_converter: Object.fromEntries });
+
+        document.getElementById("topR2").textContent = info.r2.toFixed(4);
+        document.getElementById("topRmse").textContent = info.rmse.toFixed(3);
+        document.getElementById("biasMetric").textContent = info.bias.toFixed(6);
+        document.getElementById("splitMetric").textContent = `${info.train_rows} / ${info.test_rows}`;
+        document.getElementById("supportMetric").textContent = `${info.support_vectors} vectors`;
+        document.getElementById("metricText").textContent = `${info.rmse.toFixed(3)} / ${info.r2.toFixed(4)}`;
+
+        modelReady = true;
+        document.getElementById("predictButton").disabled = false;
+        document.getElementById("predictButton").textContent = "Predict Fuel Efficiency";
+        document.getElementById("rating").textContent = "Waiting for input";
+        setStatus("Model ready. The page is now using the same SVR calculation as your Python code.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Model failed to load. Check your internet connection and open the browser console for details.");
+        document.getElementById("predictButton").textContent = "Model Not Loaded";
+      }
+    }
+
+    async function predictMPG() {
+      if (!modelReady || !pyodide) {
+        alert("Model is still loading. Please wait until the button becomes active.");
+        return;
+      }
+
+      const cylinders = Number(document.getElementById("cylinders").value);
+      const displacement = Number(document.getElementById("displacement").value);
+      const horsepower = Number(document.getElementById("horsepower").value);
+      const weight = Number(document.getElementById("weight").value);
+      const acceleration = Number(document.getElementById("acceleration").value);
+      const modelYear = Number(document.getElementById("modelYear").value);
+      const origin = Number(document.getElementById("origin").value);
+
+      pyodide.globals.set("js_cylinders", cylinders);
+      pyodide.globals.set("js_displacement", displacement);
+      pyodide.globals.set("js_horsepower", horsepower);
+      pyodide.globals.set("js_weight", weight);
+      pyodide.globals.set("js_acceleration", acceleration);
+      pyodide.globals.set("js_model_year", modelYear);
+      pyodide.globals.set("js_origin", origin);
+
+      const mpg = await pyodide.runPythonAsync(`
+predict_mpg(
+    js_cylinders,
+    js_displacement,
+    js_horsepower,
+    js_weight,
+    js_acceleration,
+    js_model_year,
+    js_origin
+)
+      `);
+
+      const finalMPG = mpg.toFixed(2);
+      document.getElementById("mpgValue").textContent = finalMPG;
+
+      const rating = document.getElementById("rating");
+      rating.className = "rating";
+
+      if (mpg >= 28) {
+        rating.textContent = "Good Fuel Efficiency";
+        rating.classList.add("good");
+      } else if (mpg >= 18) {
+        rating.textContent = "Average Fuel Efficiency";
+        rating.classList.add("average");
+      } else {
+        rating.textContent = "Poor Fuel Efficiency";
+        rating.classList.add("poor");
+      }
+
+      const meterPercent = Math.min(Math.max((mpg / 50) * 100, 0), 100);
+      document.getElementById("meterFill").style.width = meterPercent + "%";
+    }
+
+    function resetForm() {
+      document.getElementById("cylinders").value = 4;
+      document.getElementById("displacement").value = 307;
+      document.getElementById("horsepower").value = 130;
+      document.getElementById("weight").value = 3504;
+      document.getElementById("acceleration").value = 12;
+      document.getElementById("modelYear").value = 70;
+      document.getElementById("origin").value = 1;
+      document.getElementById("mpgValue").textContent = "--";
+      document.getElementById("rating").className = "rating average";
+      document.getElementById("rating").textContent = modelReady ? "Waiting for input" : "Waiting for model";
+      document.getElementById("meterFill").style.width = "0%";
+    }
+
+    loadSVRModel();
+  </script>
+</body>
+</html>
